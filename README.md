@@ -18,6 +18,7 @@ Serviço Node/Express para consumir os recursos da Gympass (Booking API, Access 
    cp .env.example .env
    ```
 3. Preencha `GYMPASS_API_KEY` (e `GYMPASS_WEBHOOK_SECRET`, se usar validação de assinatura).
+4. Configure também as variáveis `DATABASE_*` para conexão com PostgreSQL.
 
 ## Executar
 
@@ -31,9 +32,71 @@ Healthcheck:
 GET /health
 ```
 
+Healthcheck de banco:
+
+```bash
+GET /health/db
+```
+
+Teste de conexão via script:
+
+```bash
+npm run db:check
+```
+
+Migrations (criação/alteração de tabelas):
+
+```bash
+npm run migrate
+npm run migrate:status
+```
+
+Arquivos SQL de migration ficam em `src/db/migrations`.
+
 ## API exposta
 
-Prefixo base: `/api/gympass`
+Prefixo base para Gymhub (CRUD): `/api`
+
+Fluxo de comunicação:
+- Frontend (`gymhub`) chama `VITE_API_URL` (ex.: `http://localhost:3300/api`).
+- Rotas Express recebem requisições em `/api/*`.
+- Serviços do módulo `src/modules/gymhub/services` persistem dados no PostgreSQL.
+- Banco é versionado por migrations SQL em `src/db/migrations`.
+
+### Recursos Gymhub
+
+Todos os recursos suportam:
+- `GET /:resource?page=1&pageSize=10&search=&sortBy=&sortOrder=asc|desc`
+- `GET /:resource/:id`
+- `POST /:resource`
+- `PUT /:resource/:id`
+- `PATCH /:resource/:id`
+- `DELETE /:resource/:id`
+
+Recursos disponíveis:
+- `/students`
+- `/teachers`
+- `/courses`
+- `/classes`
+- `/checkins`
+
+Formato de retorno:
+- Listagem: `{ data, total, page, pageSize, totalPages }`
+- CRUD: `{ data, success, message }`
+- Erro: `{ message, statusCode, errors? }`
+
+Validações de negócio implementadas:
+- Curso exige `teacherId` válido.
+- Aula exige `teacherId` e `courseId` válidos.
+- Capacidade da aula (`classes.capacity`) não pode ultrapassar a capacidade do curso (`courses.capacity`).
+- Check-in exige `studentId` e `classId` válidos.
+- Check-in duplicado (mesmo aluno + mesma aula) é bloqueado.
+- Exclusão com dependências (ex: curso com aula, aluno com check-in) retorna `409`.
+
+Endpoint auxiliar para ambiente local:
+- `POST /api/dev/reset` (recarrega dados seed em memória)
+
+Prefixo base para integração Gympass: `/api/gympass`
 
 ### Classes
 
@@ -97,3 +160,37 @@ curl --request POST \
     ]
   }'
 ```
+
+## Execucao com Docker
+
+Arquivos adicionados:
+- `Dockerfile`
+- `docker-compose.yml`
+- `.dockerignore`
+
+### Subir ambiente
+
+```bash
+docker compose up --build
+```
+
+API disponivel em:
+- `http://localhost:3000`
+
+### Encerrar
+
+```bash
+docker compose down
+```
+
+### Subir API + Frontend juntos
+
+Use o compose unificado (requer o projeto `../gymhub` existente):
+
+```bash
+docker compose -f docker-compose.local.yml up --build
+```
+
+Servicos:
+- API: `http://localhost:3000`
+- Frontend: `http://localhost:5173`

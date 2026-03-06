@@ -18,6 +18,20 @@ const env = {
   accessBaseUrl: process.env.GYMPASS_ACCESS_BASE_URL || 'https://apitesting.partners.gympass.com/access/v1',
   setupBaseUrl: process.env.GYMPASS_SETUP_BASE_URL || 'https://apitesting.partners.gympass.com/setup/v1',
   webhookSecret: process.env.GYMPASS_WEBHOOK_SECRET || '',
+  database: {
+    host: process.env.DATABASE_HOST || '',
+    port: Number(process.env.DATABASE_PORT || 5432),
+    name: process.env.DATABASE_NAME || '',
+    user: process.env.DATABASE_USER || '',
+    password: process.env.DATABASE_PASSWORD || '',
+    sslEnabled: process.env.DATABASE_SSL !== 'false',
+    sslRejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'true',
+    forceIPv4: process.env.DATABASE_FORCE_IPV4 !== 'false',
+  },
 };
+
+env.database.isConfigured = Boolean(
+  env.database.host && env.database.port && env.database.name && env.database.user,
+);
 
 module.exports = env;
