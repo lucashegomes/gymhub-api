@@ -51,7 +51,45 @@ npm run migrate
 npm run migrate:status
 ```
 
-Arquivos SQL de migration ficam em `src/db/migrations`.
+Arquivos SQL de migration ficam em `src/database/migrations`.
+
+## Auth, RBAC E Auditoria
+
+Novos módulos:
+- `src/modules/auth`
+- `src/modules/users`
+- `src/modules/roles`
+- `src/modules/permissions`
+- `src/modules/featureFlags`
+- `src/modules/logs`
+- `src/modules/menus`
+
+Middlewares:
+- `authMiddleware` (JWT)
+- `permissionMiddleware` (RBAC/resource-action e screen)
+
+Principais endpoints:
+- `POST /api/auth/login` (email ou cpf + senha)
+- `GET /api/auth/me`
+- `POST /api/auth/request-password-reset`
+- `POST /api/auth/reset-password`
+- `GET|POST|PATCH|DELETE /api/users`
+- `POST /api/users/:id/photo` (multipart/form-data)
+- `GET|POST|PATCH|DELETE /api/roles`
+- `PUT /api/roles/:id/permissions`
+- `PUT /api/roles/:id/feature-flags`
+- `GET|POST|PATCH|DELETE /api/permissions`
+- `GET|POST|PATCH|DELETE /api/feature-flags`
+- `GET /api/logs`
+- `GET /api/menus/me`
+
+Scripts:
+- `npm run migrate`
+- `npm run migrate:status`
+- `npm run auth:bootstrap`
+
+Migrations agora ficam em:
+- `src/database/migrations`
 
 ## API exposta
 

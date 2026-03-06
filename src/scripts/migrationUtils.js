@@ -2,7 +2,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const migrationsDir = path.resolve(__dirname, '../db/migrations');
+const migrationsDir = path.resolve(__dirname, '../database/migrations');
 
 async function listMigrationFiles() {
   const entries = await fs.readdir(migrationsDir, { withFileTypes: true });

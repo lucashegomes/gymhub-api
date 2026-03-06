@@ -1,8 +1,16 @@
 const express = require('express');
+const path = require('node:path');
 const gymhubRoutes = require('./routes/gymhubRoutes');
 const gympassRoutes = require('./routes/gympassRoutes');
 const { notFoundHandler, errorHandler } = require('./middlewares/errorHandler');
 const { testDatabaseConnection } = require('./config/database');
+const authRoutes = require('./modules/auth/routes');
+const usersRoutes = require('./modules/users/routes');
+const rolesRoutes = require('./modules/roles/routes');
+const permissionsRoutes = require('./modules/permissions/routes');
+const featureFlagsRoutes = require('./modules/featureFlags/routes');
+const logsRoutes = require('./modules/logs/routes');
+const menusRoutes = require('./modules/menus/routes');
 
 const app = express();
 
@@ -45,6 +53,16 @@ app.get('/health/db', async (req, res) => {
     });
   }
 });
+
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'src/uploads')));
+
+app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/roles', rolesRoutes);
+app.use('/api/permissions', permissionsRoutes);
+app.use('/api/feature-flags', featureFlagsRoutes);
+app.use('/api/logs', logsRoutes);
+app.use('/api/menus', menusRoutes);
 
 app.use('/api', gymhubRoutes);
 app.use('/api/gympass', gympassRoutes);

@@ -13,6 +13,7 @@ function requireEnv(name, fallback) {
 const env = {
   port: Number(process.env.PORT || 3000),
   gympassApiKey: requireEnv('GYMPASS_API_KEY', ''),
+  jwtSecret: requireEnv('JWT_SECRET', 'dev-secret-change-me'),
   bookingBaseUrl: process.env.GYMPASS_BOOKING_BASE_URL || 'https://apitesting.partners.gympass.com/booking/v1',
   bookingV2BaseUrl: process.env.GYMPASS_BOOKING_V2_BASE_URL || 'https://apitesting.partners.gympass.com/booking/v2',
   accessBaseUrl: process.env.GYMPASS_ACCESS_BASE_URL || 'https://apitesting.partners.gympass.com/access/v1',

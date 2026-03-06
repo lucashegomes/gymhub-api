@@ -1,4 +1,6 @@
 const express = require('express');
+const authMiddleware = require('../middlewares/authMiddleware');
+const { checkPermission } = require('../middlewares/permissionMiddleware');
 const {
   studentsController,
   teachersController,
@@ -11,12 +13,13 @@ const {
 const router = express.Router();
 
 function mountCrud(path, controller) {
-  router.get(path, controller.list);
-  router.get(`${path}/:id`, controller.getById);
-  router.post(path, controller.create);
-  router.put(`${path}/:id`, controller.update);
-  router.patch(`${path}/:id`, controller.update);
-  router.delete(`${path}/:id`, controller.remove);
+  const resource = path.replace('/', '');
+  router.get(path, authMiddleware, checkPermission(resource, 'read'), controller.list);
+  router.get(`${path}/:id`, authMiddleware, checkPermission(resource, 'read'), controller.getById);
+  router.post(path, authMiddleware, checkPermission(resource, 'create'), controller.create);
+  router.put(`${path}/:id`, authMiddleware, checkPermission(resource, 'update'), controller.update);
+  router.patch(`${path}/:id`, authMiddleware, checkPermission(resource, 'update'), controller.update);
+  router.delete(`${path}/:id`, authMiddleware, checkPermission(resource, 'delete'), controller.remove);
 }
 
 mountCrud('/students', studentsController);
@@ -25,6 +28,6 @@ mountCrud('/courses', coursesController);
 mountCrud('/classes', classesController);
 mountCrud('/checkins', checkinsController);
 
-router.post('/dev/reset', devController.reset);
+router.post('/dev/reset', authMiddleware, checkPermission('users', 'delete'), devController.reset);
 
 module.exports = router;
