@@ -7,6 +7,7 @@ const {
   coursesController,
   classesController,
   checkinsController,
+  plansController,
   devController,
 } = require('../modules/gymhub/controllers');
 
@@ -27,6 +28,14 @@ mountCrud('/teachers', teachersController);
 mountCrud('/courses', coursesController);
 mountCrud('/classes', classesController);
 mountCrud('/checkins', checkinsController);
+mountCrud('/plans', plansController);
+
+router.get(
+  '/students/:studentId/checkins/history',
+  authMiddleware,
+  checkPermission('checkins', 'read'),
+  checkinsController.historyByStudent,
+);
 
 router.post('/dev/reset', authMiddleware, checkPermission('users', 'delete'), devController.reset);
 

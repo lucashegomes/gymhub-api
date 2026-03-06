@@ -217,6 +217,10 @@ class BaseEntityService {
         throw new AppError('Check-in duplicado nao permitido para a mesma aula', 400);
       }
 
+      if ((error.constraint || '').includes('cpf')) {
+        throw new AppError('CPF already registered', 409);
+      }
+
       throw new AppError('Registro duplicado para campo unico', 409);
     }
 
@@ -227,6 +231,12 @@ class BaseEntityService {
         classes_course_id_fkey: 'courseId invalido: curso nao encontrado',
         checkins_student_id_fkey: 'studentId invalido: aluno nao encontrado',
         checkins_class_id_fkey: 'classId invalido: aula nao encontrada',
+        course_teachers_teacher_id_fkey: 'teacherId invalido: professor nao encontrado',
+        course_teachers_course_id_fkey: 'courseId invalido: curso nao encontrado',
+        students_plans_plan_id_fkey: 'planId invalido: plano nao encontrado',
+        students_plans_student_id_fkey: 'studentId invalido: aluno nao encontrado',
+        student_guardians_student_id_fkey: 'studentId invalido: aluno nao encontrado',
+        student_guardians_guardian_student_id_fkey: 'guardianStudentId invalido: aluno nao encontrado',
       };
 
       const customMessage = byConstraint[error.constraint];

@@ -2,6 +2,7 @@ const AppError = require('../../lib/appError');
 const UsersRepository = require('./repository');
 const { hashPassword, validatePasswordStrength } = require('../../utils/password');
 const { normalizeEmail, normalizeCpf } = require('../../utils/identifier');
+const { isValidCpf } = require('../../utils/cpf');
 
 class UsersService {
   constructor() {
@@ -53,6 +54,10 @@ class UsersService {
       throw new AppError('email ou cpf obrigatorio', 400);
     }
 
+    if (cpf && !isValidCpf(cpf)) {
+      throw new AppError('CPF invalido', 400);
+    }
+
     validatePasswordStrength(payload.password || '');
 
     const passwordHash = await hashPassword(payload.password);
@@ -75,7 +80,7 @@ class UsersService {
     } catch (error) {
       if (error.code === '23505') {
         if ((error.constraint || '').includes('email')) throw new AppError('email ja cadastrado', 409);
-        if ((error.constraint || '').includes('cpf')) throw new AppError('cpf ja cadastrado', 409);
+        if ((error.constraint || '').includes('cpf')) throw new AppError('CPF already registered', 409);
       }
 
       throw error;
@@ -88,6 +93,9 @@ class UsersService {
     if (payload.name !== undefined) updateData.name = payload.name;
     if (payload.email !== undefined) updateData.email = normalizeEmail(payload.email);
     if (payload.cpf !== undefined) updateData.cpf = normalizeCpf(payload.cpf);
+    if (updateData.cpf && !isValidCpf(updateData.cpf)) {
+      throw new AppError('CPF invalido', 400);
+    }
     if (payload.roleId !== undefined) updateData.roleId = payload.roleId;
     if (payload.status !== undefined) updateData.status = payload.status;
 
@@ -108,7 +116,7 @@ class UsersService {
     } catch (error) {
       if (error.code === '23505') {
         if ((error.constraint || '').includes('email')) throw new AppError('email ja cadastrado', 409);
-        if ((error.constraint || '').includes('cpf')) throw new AppError('cpf ja cadastrado', 409);
+        if ((error.constraint || '').includes('cpf')) throw new AppError('CPF already registered', 409);
       }
 
       throw error;

@@ -1,4 +1,5 @@
 const BaseEntityService = require('./baseEntityService');
+const { validateAndNormalizeCpf } = require('../validators/cpfValidator');
 
 class TeachersService extends BaseEntityService {
   constructor() {
@@ -19,6 +20,24 @@ class TeachersService extends BaseEntityService {
       searchableFields: ['name', 'cpf', 'email', 'phone', 'specialty'],
       numericFields: ['pricePerClass'],
     });
+  }
+
+  async create(payload) {
+    return super.create({
+      ...payload,
+      cpf: validateAndNormalizeCpf(payload.cpf),
+    });
+  }
+
+  async update(id, payload) {
+    if (payload?.cpf !== undefined) {
+      return super.update(id, {
+        ...payload,
+        cpf: validateAndNormalizeCpf(payload.cpf),
+      });
+    }
+
+    return super.update(id, payload);
   }
 }
 
