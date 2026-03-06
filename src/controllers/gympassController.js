@@ -1,4 +1,5 @@
 const gympassService = require('../services/gympassService');
+const { registerAuditLog } = require('../utils/auditLog');
 
 function sendNoContentOrJson(res, data) {
   if (data === null) {
@@ -122,8 +123,20 @@ const gympassController = {
   async validateCheckin(req, res, next) {
     try {
       const data = await gympassService.validateCheckin(req.params.gymId, req.body);
+      await registerAuditLog(req, {
+        action: 'checkin_validate',
+        resource: 'gympass',
+        entityId: req.params.gymId,
+        description: `Check-in validado no gym ${req.params.gymId}`,
+      });
       res.status(200).json(data);
     } catch (error) {
+      await registerAuditLog(req, {
+        action: 'checkin_validate_failed',
+        resource: 'gympass',
+        entityId: req.params.gymId,
+        description: `Falha ao validar check-in no gym ${req.params.gymId}: ${error.message}`,
+      });
       next(error);
     }
   },
