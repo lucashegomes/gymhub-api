@@ -58,22 +58,29 @@ class StudentsService extends BaseEntityService {
     });
   }
 
-  async list({ page, pageSize, search, sortBy, sortOrder }) {
+  async list({ page, pageSize, search, sortBy, sortOrder, adultOnly }) {
     const values = [];
-    let whereSql = '';
+    const whereConditions = [];
 
     if (search) {
       values.push(`%${search}%`);
-      whereSql = `
-        where (
+      const pos = values.length;
+      whereConditions.push(`
+        (
           s.name ilike $1
           or s.cpf ilike $1
           or s.email ilike $1
           or s.phone ilike $1
           or coalesce(s.integration_id, '') ilike $1
         )
-      `;
+      `.replaceAll('$1', `$${pos}`));
     }
+
+    if (adultOnly) {
+      whereConditions.push(`s.birth_date <= (current_date - interval '18 years')`);
+    }
+
+    const whereSql = whereConditions.length ? `where ${whereConditions.join(' and ')}` : '';
 
     const sortFieldMap = {
       name: 's.name',

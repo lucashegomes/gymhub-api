@@ -8,6 +8,11 @@ function toPositiveInt(value, fallback) {
 }
 
 function parseListQuery(query) {
+  const adultOnly =
+    query.adultOnly === '1' ||
+    query.adultOnly === 'true' ||
+    query.adultOnly === true;
+
   return {
     page: toPositiveInt(query.page, 1),
     pageSize: toPositiveInt(query.pageSize, 10),
@@ -19,6 +24,7 @@ function parseListQuery(query) {
     courseId: typeof query.courseId === 'string' ? query.courseId : '',
     classId: typeof query.classId === 'string' ? query.classId : '',
     studentId: typeof query.studentId === 'string' ? query.studentId : '',
+    adultOnly,
   };
 }
 
