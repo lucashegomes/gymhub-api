@@ -1,10 +1,11 @@
-# Gymhub API (Node)
+# Gymhub API
 
 Serviço Node/Express para consumir os recursos da Gympass (Booking API, Access Control API, Setup API) e expor uma API própria para gerenciamento.
 
 ## Requisitos
 
 - Node.js 18+
+- PostgreSQL
 - Credenciais de API da Gympass
 
 ## Configuração
@@ -13,36 +14,43 @@ Serviço Node/Express para consumir os recursos da Gympass (Booking API, Access 
    ```bash
    npm install
    ```
-2. Copie as variáveis:
+2. Copie o arquivo de exemplo `.env` e configure as variáveis de ambiente:
    ```bash
    cp .env.example .env
    ```
-3. Preencha `GYMPASS_API_KEY` (e `GYMPASS_WEBHOOK_SECRET`, se usar validação de assinatura).
-4. Configure também as variáveis `DATABASE_*` para conexão com PostgreSQL.
+3. Preencha as variáveis obrigatórias no arquivo `.env`:
+   - `GYMPASS_API_KEY`
+   - `GYMPASS_WEBHOOK_SECRET` (opcional, para validação de assinatura)
+   - Configurações do banco de dados: `DATABASE_HOST`, `DATABASE_USER`, `DATABASE_PASSWORD`, etc.
 
-## Executar
+## Execução
 
+Para iniciar o servidor em modo de desenvolvimento:
 ```bash
 npm run dev
 ```
 
-Healthcheck:
+### Endpoints de Healthcheck
 
-```bash
-GET /health
-```
+- Verificar status da API:
+  ```bash
+  GET /health
+  ```
+- Verificar status do banco de dados:
+  ```bash
+  GET /health/db
+  ```
 
-Healthcheck de banco:
+### Scripts Úteis
 
-```bash
-GET /health/db
-```
-
-Teste de conexão via script:
-
-```bash
-npm run db:check
-```
+- Testar conexão com o banco de dados:
+  ```bash
+  npm run db:check
+  ```
+- Executar migrations:
+  ```bash
+  npm run migrate
+  ```
 
 Migrations (criação/alteração de tabelas):
 
